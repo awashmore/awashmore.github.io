@@ -1,34 +1,48 @@
 import nfl_data_py as nfl
-import matplotlib.pyplot as plt
-import pandas as pd
 
-#gather the fantasy data
-weekly_data = nfl.import_weekly_data([2022], ['player_name', 'position', 'week', 'fantasy_points_ppr'])
-weekly_data.sort_values(by=['fantasy_points_ppr'], ascending=False, inplace=True)
-weekly_data.sort_values(by=['week', 'position'], ascending=True, inplace=True)
+years = list(range(1999,2023))
+weekly_data = nfl.import_weekly_data(years, ['player_display_name',
+                                             'position', 
+                                              'season', 
+                                              'week',
+                                              'receptions',
+                                              'targets',
+                                              'receiving_tds', 
+                                              'receiving_yards',
+                                              'receiving_air_yards', 
+                                              'receiving_yards_after_catch', 
+                                              'receiving_first_downs', 
+                                              'receiving_epa',
+                                              'racr',
+                                              'target_share',
+                                              'air_yards_share',
+                                              'wopr',
+                                              'fantasy_points_ppr'])
+weekly_data.sort_values(by=['season', 'week'], ascending=True, inplace=True)
 weekly_data = weekly_data.reset_index()
-weekly_data = weekly_data[(weekly_data.position == 'QB') | (weekly_data.position == 'RB') | (weekly_data.position == 'WR') | (weekly_data.position == 'TE')]
-weekly_data = weekly_data.reset_index()
-weekly_data.to_excel('weekly_fantasy_data.xlsx', engine='xlsxwriter')
+wr_stats = weekly_data[(weekly_data.position == 'WR')]
+wr_stats = wr_stats[wr_stats['player_display_name'].notnull()]
 
-mahomes_data = weekly_data[(weekly_data.player_name == 'P.Mahomes')]
-# mahomes_data = mahomes_data.reset_index()
-mahomes_data_new = pd.DataFrame(mahomes_data, columns=['position', 'week', 'fantasy_points_ppr'])
-# mahomes_data.loc[:, 'player_name':'fantasy_points_ppr']
-mahomes_data_new.to_excel('mahomes_fantasy_data.xlsx', engine='xlsxwriter')
+# group the data by player and season, and calculate the sum of weekly stats
+season_totals = wr_stats.groupby(['player_display_name', 'season']).agg({
+    'receiving_yards': 'sum',
+    'receiving_tds': 'sum',
+    'receptions': 'sum',
+    'targets': 'sum',
+    'receiving_air_yards': 'sum',
+    'receiving_yards_after_catch': 'sum',
+    'receiving_first_downs': 'sum',
+    'receiving_epa': 'mean',
+    'racr': 'mean',
+    'target_share': 'mean',
+    'air_yards_share': 'mean',
+    'wopr': 'mean',
+    'fantasy_points_ppr': 'mean'
+}).reset_index()
 
-player_data = nfl.import_ids()
-player_data = player_data.reset_index()
-player_data = player_data[(player_data.position == 'QB') | (player_data.position == 'RB') | (player_data.position == 'WR') | (player_data.position == 'TE')]
-player_data.to_excel('player_data.xlsx', engine='xlsxwriter')
-# player_names = player_data['name'].to_list()
+wr_with_10_tds = season_totals[season_totals['receiving_tds'] >= 10]
+wr_names = wr_with_10_tds['player_display_name'].to_list()
 
-# mahomes_data_new.plot(x='week', y='fantasy_points_ppr')
-# plt.scatter(mahomes_data_new['week'], mahomes_data_new['fantasy_points_ppr'])
-# plt.xticks(range(1, 23))
-# plt.show()
-
-print(mahomes_data_new)
-
-# for player in player_names:
-#     print(player)
+season_totals = season_totals[season_totals['player_display_name'].isin(wr_names)].reset_index()
+season_totals.sort_values(by=['player_display_name', 'season'], ascending=True, inplace=True)
+season_totals.to_excel('wr_statistics.xlsx', engine='xlsxwriter')
