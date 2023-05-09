@@ -3,7 +3,7 @@
 <body>
 
 <?php
-echo shell_exec("nfl.py");
+echo shell_exec("python nfl.py");
 ?>
 
 </body>
