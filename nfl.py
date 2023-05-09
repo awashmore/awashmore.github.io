@@ -24,9 +24,9 @@ player_data.to_excel('player_data.xlsx', engine='xlsxwriter')
 # player_names = player_data['name'].to_list()
 
 # mahomes_data_new.plot(x='week', y='fantasy_points_ppr')
-plt.scatter(mahomes_data_new['week'], mahomes_data_new['fantasy_points_ppr'])
-plt.xticks(range(1, 23))
-plt.show()
+# plt.scatter(mahomes_data_new['week'], mahomes_data_new['fantasy_points_ppr'])
+# plt.xticks(range(1, 23))
+# plt.show()
 
 print(mahomes_data_new)
 
