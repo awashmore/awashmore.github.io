@@ -5,7 +5,7 @@
 Hello World!
 
 <?php
-echo shell_exec("python nfl.py");
+echo shell_exec("python test.py");
 ?>
 
 </body>
