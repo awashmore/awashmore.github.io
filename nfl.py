@@ -28,5 +28,7 @@ plt.scatter(mahomes_data_new['week'], mahomes_data_new['fantasy_points_ppr'])
 plt.xticks(range(1, 23))
 plt.show()
 
+print(mahomes_data_new)
+
 # for player in player_names:
 #     print(player)
